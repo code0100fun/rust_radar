@@ -4,6 +4,7 @@ var express = require('express')
     , server = require('http').createServer(app)
     , io = require('socket.io').listen(server);
 
+var port = process.env.PORT || 9000;
 server.listen(9000);
 
 app.use('/', express.static(__dirname + '/../dist/'));
