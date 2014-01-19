@@ -7,6 +7,7 @@ Hashids = require("hashids")
 haml = require("haml-coffee")
 jade = require("jade")
 cookie = require('cookie')
+crypto = require('crypto')
 
 hashes = {}
 counter = Math.floor(Math.random() * 1000)
@@ -36,7 +37,6 @@ app.use staticsPlaceholder = (req, res, next) ->
   next()
 
 app.get "/", (req, res) ->
-  console.log '/'
   newHash = hashids.encrypt(counter)
   hashes[newHash] = "success"
   counter = counter + 1
@@ -57,16 +57,26 @@ start_chat = (namespace) ->
   usernames = {}
   chat = io.of("/" + namespace).on("connection", (socket) ->
 
+    shasum = crypto.createHash('sha1')
+
     default_username = ->
       if socket.handshake.headers && socket.handshake.headers.cookie
         c = cookie.parse(socket.handshake.headers.cookie)
         c['rustradar.username']
 
+    generate_username = ->
+      shasum.update socket.id
+      hash = shasum.digest('hex').slice(0,7)
+      "guest_#{hash}"
+
+    trim_username = (username) ->
+      username.slice(0,20)
+
     unique_username = (username) ->
       username.toLowerCase().replace(/^\s\s*/, '').replace(/\s\s*$/, '')
 
     update_username = (username) ->
-      console.log 'update_username', username
+      username = trim_username username
       unique = unique_username username
       unless usernames[unique]
         delete usernames[socket.username]
@@ -89,14 +99,13 @@ start_chat = (namespace) ->
         options = unique 
         unique = undefined
       unique ?= username
-      console.log 'set_username', username, unique, options
       socket.username = unique
       user = extend {username:username}, options
       usernames[unique] = user
 
-    set_username "guest_#{socket.id}", {generated:true}
-    username = default_username() || "guest_#{socket.id}"
-    console.log 'username', username, socket.username
+    generated_username = generate_username()
+    set_username generated_username, {generated:true}
+    username = default_username() || generated_username
     update_username username
 
     socket.on "mousemove", (data) ->

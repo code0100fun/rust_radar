@@ -52,7 +52,6 @@ socket.on "update_username", (data) ->
   $('.username').text(username)
   $('.users input.username').val(username)
   $.cookie('rustradar.username', username) unless data.generated
-  console.log 'default username', data, $.cookie('rustradar.username')
 
 prev = {}
 canvas.on "mousedown", (e) ->
