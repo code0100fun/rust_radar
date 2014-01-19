@@ -34,6 +34,10 @@
         %p Map by: 
           %span 
             %a{href: "https://twitter.com/brandy_92", target:"_blank"} @brandy_92
+
+      .left
+        %span.center-message Like Rust, this site is still VERY alpha. Donate to help help make it better!
+
       .right
         %span Bitcoins:
           %p 14nL14KCoTbGN7VVSrwk51RyGKrBvmY5xM
