@@ -31,16 +31,7 @@ app.engine "hamlc", haml.__express
 app.set "view engine", "hamlc"
 app.use express.favicon()
 app.use express.logger("dev")
-# app.use express.bodyParser()
-# app.use express.methodOverride()
-# app.use express.cookieParser()
-# app.use express.session(
-#   secret: "abc123"
-#   cookie:
-#     maxAge: 20000000
-# )
 app.use express.errorHandler()
-# app.use app.router
 app.use staticsPlaceholder = (req, res, next) ->
   next()
 
@@ -67,7 +58,7 @@ start_chat = (namespace) ->
   chat = io.of("/" + namespace).on("connection", (socket) ->
 
     default_username = ->
-      if socket.handshake.headers
+      if socket.handshake.headers && socket.handshake.headers.cookie
         c = cookie.parse(socket.handshake.headers.cookie)
         c['rustradar.username']
 
