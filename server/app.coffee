@@ -19,9 +19,7 @@ port = process.env.PORT or 9000
 
 appDir = path.join(__dirname, "../app")
 if "production" is app.get("env")
-  # TODO - uncomment when released
-  # mixpanel_key = "669a02e9b4e6b4efe1eface05261703b"
-  mixpanel_key = "b8a72ab46f6a411eb4b9aee5e84ad917"
+  mixpanel_key = "669a02e9b4e6b4efe1eface05261703b"
   buildDir = path.join(__dirname, "../dist")
 else
   mixpanel_key = "b8a72ab46f6a411eb4b9aee5e84ad917"
