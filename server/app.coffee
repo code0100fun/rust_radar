@@ -94,7 +94,7 @@ start_chat = (namespace, generated_room) ->
       usernames[socket.username]
 
     delete_user = ->
-      delete usernames[username]
+      delete usernames[socket.username]
 
     update_username = (username) ->
       username = trim_username username
