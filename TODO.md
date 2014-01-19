@@ -1,23 +1,8 @@
 #TODO
 
 ## In Work
-* Add MixPanel
-	* Track random rooms created
-	* Track random rooms joined
-	* Track custom rooms created
-	* Track custom rooms joined
-	* Change username
-	* Track new users
 
 ## Backlog
-* Add sticky footer
-* Add contact info
-* Donate button
-* Bitcoin address
-* Fix user list styles
-	* No bullets
-	* Shadow
-	* Button and input update
 
 # Icebox
 
@@ -34,3 +19,18 @@
 	* push to heroku with `git push heroku`
 * Change random username to append 7 charater hash
 * Limit username length
+* Add MixPanel
+	* Track random rooms created
+	* Track random rooms joined
+	* Track custom rooms created
+	* Track custom rooms joined
+	* Change username
+	* Track new users
+* Add sticky footer
+* Add contact info
+* Donate button
+* Bitcoin address
+* Fix user list styles
+	* No bullets
+	* Shadow
+	* Button and input update
