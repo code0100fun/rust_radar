@@ -31,20 +31,21 @@ app.engine "hamlc", haml.__express
 app.set "view engine", "hamlc"
 app.use express.favicon()
 app.use express.logger("dev")
-app.use express.bodyParser()
-app.use express.methodOverride()
-app.use express.cookieParser()
-app.use express.session(
-  secret: "abc123"
-  cookie:
-    maxAge: 20000000
-)
+# app.use express.bodyParser()
+# app.use express.methodOverride()
+# app.use express.cookieParser()
+# app.use express.session(
+#   secret: "abc123"
+#   cookie:
+#     maxAge: 20000000
+# )
 app.use express.errorHandler()
-app.use app.router
+# app.use app.router
 app.use staticsPlaceholder = (req, res, next) ->
   next()
 
 app.get "/", (req, res) ->
+  console.log '/'
   newHash = hashids.encrypt(counter)
   hashes[newHash] = "success"
   counter = counter + 1
