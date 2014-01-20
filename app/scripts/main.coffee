@@ -2,17 +2,13 @@ doc = $(document)
 win = $(window)
 canvas = $("#canvas")
 ctx = canvas[0].getContext("2d")
-mapCanvas = $("#map")
-mapCtx = mapCanvas[0].getContext("2d")
 instructions = $("#instructions")
 background = new Image()
-background.src = "images/map.jpg"
+background.src = "images/map_large.jpg"
 background.onload = ->
-  mapCanvas[0].width = background.width
-  mapCanvas[0].height = background.height
   canvas[0].width = background.width
   canvas[0].height = background.height
-  mapCtx.drawImage background, 0, 0
+  ctx.drawImage background, 0, 0
 
 url = location
 id = Math.round($.now() * Math.random())
@@ -23,7 +19,6 @@ cursors = {}
 canvas[0].width = $(window).width()
 canvas[0].height = $(window).height()
 
-window.socket = socket
 socket.on "moving", (data) ->
   cursors[data.id] = $("<div class=\"cursor\">").appendTo("#cursors")  unless data.id of clients
   cursors[data.id].css
@@ -38,6 +33,27 @@ $('.users input.button').click =>
   username = $('.users input.username').val()
   socket.emit 'change_name', username
 
+$chat_field = $('.chat .input input')
+$chat_field.keyup (e) ->
+  if(e.keyCode == 13)
+    message = $chat_field.val()
+    $chat_field.val('')
+    send_chat message
+
+send_chat = (message) ->
+  if !!message
+    message = message.slice(0,120)
+    socket.emit("send_chat", message)
+
+new_chat_message = (username, message) ->
+  $message = $('<p class="message"><span class="username"></span><span> : </span><span class="content"></span></p>')
+  $message.find('.username').text(username)
+  $message.find('.content').text(message)
+  $messages = $('.chat .messages')
+  $messages.append($message)
+  # TODO - if chat was scrolled to bottom keep it there
+  $messages[0].scrollTop = $messages[0].scrollHeight
+
 socket.on "update_users", (usernames) ->
   $users = $('.users')
   $list = $users.find('ul')
@@ -49,10 +65,12 @@ socket.on "update_users", (usernames) ->
 
 socket.on "update_username", (data) ->
   username = data.username
-  $('.username').text(username)
   $('.users input.username').val(username)
   $.cookie('rustradar.username', username) unless data.generated
 
+socket.on "update_chat", (username, data) ->
+  new_chat_message username, data
+  
 prev = {}
 canvas.on "mousedown", (e) ->
   e.preventDefault()
@@ -64,14 +82,35 @@ canvas.on "mousedown", (e) ->
 doc.bind "mouseup mouseleave", ->
   drawing = false
 
+
+map_z_top = -7200.0
+map_x_left = 2470.0
+map_scale = 3.29
+
+map_to_canvas_coords = (mx, mz) ->
+  cx = (mz - map_z_top) / map_scale
+  cy = (mx - map_x_left) / map_scale
+  {x:cx, y:cy}
+
+canvas_to_map_coords = (cx, cy) ->
+  mx = (cy * map_scale) + map_x_left
+  mz = (cx * map_scale) + map_z_top
+  {x:mx, z:mz}
+
 lastEmit = $.now()
 doc.on "mousemove", (e) ->
-  x = e.pageX
-  y = e.pageY
+  rect = canvas[0].getBoundingClientRect()
+  x = e.clientX - rect.left
+  y = e.clientY - rect.top
+  map_coords = canvas_to_map_coords x, y
+  $('.map-x').text(map_coords.x.toFixed(2))
+  $('.map-z').text(map_coords.z.toFixed(2))
   if $.now() - lastEmit > 30
     socket.emit "mousemove",
       x: x
       y: y
+      # raw_x: map_coords.x
+      # raw_z: map_coords.z
       drawing: drawing
       id: id
 

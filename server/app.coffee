@@ -142,8 +142,8 @@ start_chat = (namespace, generated_room) ->
     socket.on "mousemove", (data) ->
       socket.broadcast.emit "moving", data
 
-    # socket.on "send_chat", (data) ->
-    #   chat.emit "update_chat", socket.username, data
+    socket.on "send_chat", (data) ->
+      chat.emit "update_chat", socket.username, data
 
     socket.on "change_name", (username) ->
       old_username = get_user().username

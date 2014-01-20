@@ -28,20 +28,85 @@ a{
         color: #0088ee;
     }
 }
+
+.dark {
+    background-color: rgba(0,0,0,0.7);
+}
+
+.panel {
+    padding: 20px;
+    color: #ccc;
+    box-shadow: 5px 5px 6px rgba(10, 10, 10, 0.45);
+    position:fixed;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 20;
+}
+
+.panel-top-left {
+    top: 0;
+    left: 0;
+}
+
+.panel-bottom-left {
+    bottom: 0;
+    left: 0;
+}
+
+.panel-top-right {
+    top: 0;
+    right: 0;
+}
+
+.panel-bottom {
+    bottom: 0;
+    left: 0;
+}
+
 .center-message {
     margin-left: 40px;
 }
+
+.chat {
+    padding: 5px;
+    bottom: 65px;
+    left: 5px;
+    max-height: 200px;
+    min-height: 30px;
+    width: 350px;
+    .messages {
+        max-height: 180px;
+        min-height: 30px;
+        width: 100%;
+        overflow: auto;
+        .username {
+            font-size: 12px;
+            font-weight: normal;
+            font-style: italic;
+            color: #999;
+        }
+        .content {
+            font-size: 13px;
+            font-weight: normal;
+            padding-bottom: 8px;
+            word-wrap:break-word;
+        }
+    }
+    .input {
+        width: 100%;
+        input {
+            width: 100%;
+        }
+    }
+}
+
+.location {
+    min-height: 30px;
+    min-width: 150px;
+}
+
 .users {
-    box-shadow: 5px 5px 6px rgba(10, 10, 10, 0.45);
-    position:fixed;
-    top: 0;
-    left: 0;
-    z-index: 20;
     min-height: 100px;
     min-width: 200px;
-    padding: 20px;
-    color: #ccc;
-    background-color: rgba(0,0,0,0.7);
     .names {
         overflow: auto;
         width: 100%;
@@ -56,16 +121,10 @@ a{
 }
 
 .footer {
-    box-shadow: 0 -5px 6px rgba(10, 10, 10, 0.45);
-    position:fixed;
-    bottom: 0;
-    left: 0;
+    box-shadow: 0 -3px 4px rgba(10, 10, 10, 0.45);
     width: 100%;
-    z-index: 20;
-    max-height: 80px;
+    height: 50px;
     padding: 5px;
-    color: #ccc;
-    background-color: rgba(0,0,0,0.7);
     .span {
         padding: 5px;
     }
@@ -95,6 +154,7 @@ hgroup{
     border-radius: 10px;
     box-shadow: 0 0 3px rgba(100, 100, 100, 0.1), 0 3px 1px #D4D4D4;
     color: #555;
+    z-index: 50;
 }
 
 h1{

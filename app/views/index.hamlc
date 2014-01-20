@@ -9,7 +9,6 @@
     %link{href: "styles/main.css", rel: "stylesheet"}
   %body
     #cursors
-    %canvas#map
     %canvas#canvas
     %hgroup#instructions
       %h1 Draw on the map!!
@@ -17,13 +16,31 @@
       %h3 Tip: you can change the room name in the address bar
       %h3 Tip: if the map gets cluttered, simply reload the page
 
-    .users
+    .users.dark.panel.panel-top-left
       %input.username{type: "text"}
       %input.button{type: "button", value: "Change"}
       %h3 Name changes will be remembered next time you join
       .names
         %ul
-    .footer
+    .location.dark.panel.panel-top-right
+      %h3 Mouse Location:
+      %p
+        %span x:
+        %span.map-x ?
+        %span ,
+        %span z:
+        %span.map-z ?
+
+    .chat.dark.panel.panel-bottom-left
+      .messages
+        %p.message
+          %span.username code0100fun
+          %span :
+          %span.content This is amazing!!!
+      .input
+        %input{type:"text"}
+
+    .footer.dark.panel.panel-bottom
       .left
         %p &copy; 2014 RustRadar.com
         %p Developed by: 
