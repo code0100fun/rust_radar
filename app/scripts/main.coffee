@@ -19,6 +19,8 @@ cursors = {}
 canvas[0].width = $(window).width()
 canvas[0].height = $(window).height()
 
+current_user = {}
+
 socket.on "moving", (data) ->
   cursors[data.id] = $("<div class=\"cursor\">").appendTo("#cursors")  unless data.id of clients
   cursors[data.id].css
@@ -31,7 +33,22 @@ socket.on "moving", (data) ->
 
 $('.users input.button').click =>
   username = $('.users input.username').val()
-  socket.emit 'change_name', username
+  x = ~~$('.users input.user-x').val()
+  z = ~~$('.users input.user-z').val()
+  user = {username,x,z}
+  socket.emit('update_user', user) if !!user.username
+
+toggle_edit_user = =>
+  $edit_user = $('.edit-user')
+  if $edit_user.is(':visible')
+    $edit_user.slideUp()
+  else
+    $edit_user.slideDown()
+
+
+$('.users .current-user .username').click =>
+  toggle_edit_user()
+  false
 
 $chat_field = $('.chat .input input')
 $chat_field.keyup (e) ->
@@ -55,7 +72,6 @@ new_chat_message = (username, message) ->
   $messages[0].scrollTop = $messages[0].scrollHeight
 
 socket.on "update_users", (users) ->
-  console.log 'update_users', users
   $users = $('.users')
   $list = $users.find('ul')
   $list.empty()

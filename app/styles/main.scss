@@ -34,7 +34,7 @@ a{
 }
 
 .panel {
-    padding: 20px;
+    padding: 10px;
     color: #ccc;
     box-shadow: 5px 5px 6px rgba(10, 10, 10, 0.45);
     position:fixed;
@@ -67,6 +67,12 @@ a{
 }
 
 .chat {
+    .header {
+        width: 100%;
+        h2 {
+            text-align: center;
+        }
+    }
     padding: 5px;
     bottom: 65px;
     left: 5px;
@@ -105,8 +111,25 @@ a{
 }
 
 .users {
+    .edit-user {
+        input {
+            margin-bottom: 3px;
+        }
+        margin-bottom: 5px;
+    }
+    .current-user {
+        padding-top: 3px;
+        padding-bottom: 3px;
+        border-bottom: 1px solid #ccc;
+    }
+    .username {
+        width: 90px;
+    }
+    .user-x, .user-z {
+        width: 60px;
+    }
     min-height: 100px;
-    min-width: 200px;
+    min-width: 100px;
     .names {
         overflow: auto;
         width: 100%;

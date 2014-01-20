@@ -17,11 +17,21 @@
       %h3 Tip: if the map gets cluttered, simply reload the page
 
     .users.dark.panel.panel-top-left
-      %input.username{type: "text"}
-      %input.button{type: "button", value: "Change"}
-      %h3 Name changes will be remembered next time you join
+      .edit-user
+        %label
+          x:
+          %input.user-x{type: "text"}
+        %label
+          z:
+          %input.user-z{type: "text"}
+        %p
+          %input.username{type: "text"}
+          %input.button{type: "button", value: "Update"}
+      .current-user
+        %a.username{href:"#"}
       .names
         %ul
+
     .location.dark.panel.panel-top-right
       %h3 Mouse Location:
       %p
@@ -32,6 +42,8 @@
         %span.map-z ?
 
     .chat.dark.panel.panel-bottom-left
+      .header
+        %h2 Chat
       .messages
       .input
         %input{type:"text"}
@@ -39,14 +51,15 @@
     .footer.dark.panel.panel-bottom
       .left
         %p &copy; 2014 RustRadar.com
-        %p Developed by: 
-          %span 
+        %p Developed by:
+          %span
             %a{href: "https://twitter.com/code0100fun", target:"_blank"} @code0100fun
-          %span and 
+          %span and
             %a{href: "https://twitter.com/scripterio", target:"_blank"} @scripterio
-        %p Map by: 
-          %span 
-            %a{href: "https://twitter.com/brandy_92", target:"_blank"} @brandy_92
+        %p Map by:
+          %span
+            AlphaCheeto
+            -# %a{href: "https://twitter.com/brandy_92", target:"_blank"} @brandy_92
 
       .left
         %span.center-message Like Rust, this site is still VERY alpha.
@@ -69,4 +82,4 @@
     %script{src: "scripts/mixpanel.js"}
     :javascript
       var mixpanel_key = '#{@mixpanel_key}';
-      mixpanel.init(mixpanel_key); 
+      mixpanel.init(mixpanel_key);
