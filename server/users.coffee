@@ -32,10 +32,8 @@ class Users
       attributes.generated = false
       valid = @validate_unique attributes.username
     unless valid
-      console.log 'invalid', @list
       invalid() if invalid?
     else
-      console.log 'valid', user, attributes
       delete attributes.id
       user.update attributes if valid
       success(user) if success?
@@ -44,7 +42,6 @@ class Users
       #   username: user.username
       #   generated: user.generated
 
-    console.log 'after update', user
     @find id:user.id
 
   validate_unique: (username) ->
@@ -58,7 +55,6 @@ class Users
       attributes.username = "guest_#{hash}"
     unique = @validate_unique attributes.username
     unless unique
-      console.log 'invalid', @list
       invalid() if invalid?
     else
       attributes.id = hash

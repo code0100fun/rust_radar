@@ -14,7 +14,6 @@ class User
     @generated = if attributes.generated? then attributes.generated else @generated
 
   attributes: ->
-    console.log 'attributes', @
     {@id,@username,@x,@z,@generated}
 
 module.exports = User

@@ -7,6 +7,16 @@ module.exports = function (grunt) {
 
     grunt.initConfig({
 
+        mochaTest: {
+            test: {
+                options: {
+                    reporter: 'spec',
+                    compilers: 'coffee:coffee-script'
+                },
+                src: ['test/**/*.coffee']
+            }
+        },
+
         express: {
             options: {
                 cmd: 'coffee',
@@ -178,5 +188,5 @@ module.exports = function (grunt) {
         'copy:dist',
     ]);
 
-    grunt.registerTask('default', 'server');
+    grunt.registerTask('default', 'mochaTest');
 };
