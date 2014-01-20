@@ -33,10 +33,6 @@
 
     .chat.dark.panel.panel-bottom-left
       .messages
-        %p.message
-          %span.username code0100fun
-          %span :
-          %span.content This is amazing!!!
       .input
         %input{type:"text"}
 
