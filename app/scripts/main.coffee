@@ -54,23 +54,30 @@ new_chat_message = (username, message) ->
   # TODO - if chat was scrolled to bottom keep it there
   $messages[0].scrollTop = $messages[0].scrollHeight
 
-socket.on "update_users", (usernames) ->
+socket.on "update_users", (users) ->
+  console.log 'update_users', users
   $users = $('.users')
   $list = $users.find('ul')
   $list.empty()
-  for unique, user of usernames
-    $li = $('<li>')
-    $li.text user.username
-    $list.append($li)
+  for unique, user of users
+    if !current_user || user.username != current_user.username
+      $li = $('<li>')
+      $li.attr('data-username', user.username)
+      $li.text user.username
+      $list.append($li)
 
-socket.on "update_username", (data) ->
-  username = data.username
+socket.on "update_user", (user) ->
+  console.log 'update_user', user
+  current_user = user
+  username = current_user.username
   $('.users input.username').val(username)
-  $.cookie('rustradar.username', username) unless data.generated
+  $('.users .current-user .username').text(username)
+  $('.users .names [data-username="'+username+'"]').remove()
+  $.cookie('rustradar.username', username) unless user.generated
 
-socket.on "update_chat", (username, data) ->
-  new_chat_message username, data
-  
+socket.on "update_chat", (username, message) ->
+  new_chat_message username, message
+
 prev = {}
 canvas.on "mousedown", (e) ->
   e.preventDefault()

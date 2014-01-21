@@ -7,8 +7,8 @@ Hashids = require("hashids")
 haml = require("haml-coffee")
 jade = require("jade")
 cookie = require('cookie')
-crypto = require('crypto')
 Mixpanel = require('mixpanel')
+Users = require('./users')
 
 hashes = {}
 counter = Math.floor(Math.random() * 1000)
@@ -63,77 +63,64 @@ app.get "/:hash", (req, res) ->
 server.listen port
 
 start_chat = (namespace, generated_room) ->
+
   namespace_status[namespace] = { generated: generated_room }
 
   mixpanel.track "room_created",
     room_name: namespace,
     generated: generated_room
 
-  usernames = {}
-  chat = io.of("/" + namespace).on("connection", (socket) ->
+  users = new Users
 
-    shasum = crypto.createHash('sha1')
+  chat = io.of("/" + namespace).on("connection", (socket) ->
 
     default_username = ->
       if socket.handshake.headers && socket.handshake.headers.cookie
         c = cookie.parse(socket.handshake.headers.cookie)
         c['rustradar.username']
 
-    generate_username = ->
-      shasum.update socket.id
-      hash = shasum.digest('hex').slice(0,7)
-      "guest_#{hash}"
+    current_user = ->
+      users.find id: socket.user_id
 
-    trim_username = (username) ->
-      username.slice(0,20)
+    destroy_current_user = ->
+      users.destroy current_user().id
+      send_all_users()
 
-    unique_username = (username) ->
-      username.toLowerCase().replace(/^\s\s*/, '').replace(/\s\s*$/, '')
+    user_updated_success = (user) ->
+      set_current_user user
+      send_current_user()
+      send_all_users()
 
-    get_user = ->
-      usernames[socket.username]
+    user_update_invalid = ->
+      send_current_user()
 
-    delete_user = ->
-      delete usernames[socket.username]
+    update_user = (attributes) ->
+      users.update current_user(),
+                  attributes,
+                  user_updated_success,
+                  user_update_invalid
 
-    update_username = (username) ->
-      username = trim_username username
-      unique = unique_username username
-      unless usernames[unique]
-        delete_user()
-        set_username username, unique
-      send_username_updates()
+    send_current_user = ->
+      socket.emit "update_user", current_user()
 
-    send_username_updates = ->
-      chat.emit "update_users", usernames
-      socket.emit "update_username", get_user()
+    send_all_users = ->
+      chat.emit "update_users", users.all()
 
-    extend = (target) ->
-      sources = [].slice.call(arguments, 1)
-      sources.forEach (source) ->
-        for prop of source
-          target[prop] = source[prop]
-      target
+    set_current_user = (user) ->
+      socket.user_id = user.id
 
-    set_username = (username, unique=username, options={}) ->
-      if typeof(unique) == 'object'
-        options = unique
-        unique = undefined
-      unique ?= username
-      socket.username = unique
-      user = extend {username:username}, options
-      usernames[unique] = user
+    user_create_success = (user) ->
+      set_current_user user
+      send_current_user()
+      send_all_users()
 
-    generated_username = generate_username()
-    set_username generated_username, {generated:true}
-    username = default_username() || generated_username
-    update_username username
+    user_create_invalid = ->
+      users.create({}, user_create_success)
 
-    user = get_user()
-    mixpanel.track "update_username",
-      username: user.username
-      generated: user.generated
+    attributes = {username:default_username()}
+    users.create(attributes, user_create_success, user_create_invalid)
 
+    user = current_user()
     mixpanel.track "joined_room",
       room_name: namespace,
       generated_room: generated_room
@@ -142,23 +129,16 @@ start_chat = (namespace, generated_room) ->
     socket.on "mousemove", (data) ->
       socket.broadcast.emit "moving", data
 
-    socket.on "send_chat", (data) ->
-      chat.emit "update_chat", socket.username, data
+    socket.on "send_chat", (message) ->
+      chat.emit "update_chat", current_user().username, message
 
-    socket.on "change_name", (username) ->
-      old_username = get_user().username
-      update_username username
-      user = get_user()
-      mixpanel.track "update_username",
-        previous: old_username
-        username: user.username
-        generated: user.generated
+    socket.on "update_user", (attributes) ->
+      update_user attributes
       # socket.emit "updatechat", "SERVER", "you have connected"
       # chat.emit "updatechat", "SERVER", username + " has connected"
 
     socket.on "disconnect", ->
-      delete usernames[socket.username]
-      chat.emit "update_users", usernames
+      destroy_current_user()
       # chat.emit "update_chat", "SERVER", socket.username + " has disconnected"
 
   )
