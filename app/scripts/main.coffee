@@ -83,7 +83,6 @@ socket.on "update_users", (users) ->
       $list.append($li)
 
 socket.on "update_user", (user) ->
-  console.log 'update_user', user
   current_user = user
   username = current_user.username
   $('.users input.username').val(username)

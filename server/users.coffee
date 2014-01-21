@@ -1,5 +1,5 @@
 User = require './user'
-crypto = require('crypto')
+hash = require('./hash')
 
 class Users
   constructor: ->
@@ -7,9 +7,6 @@ class Users
 
   trim_username: (username) ->
     username.slice(0,20)
-
-  @random_hash: ->
-    crypto.createHash('sha1').update(Math.random().toString()).digest('hex').slice(0,7)
 
   all: ->
     user for id, user of @list
@@ -49,15 +46,15 @@ class Users
     !user
 
   create: (attributes, success, invalid) ->
-    hash = Users.random_hash()
+    h = hash(7)
     unless attributes.username?
       attributes.generated = true
-      attributes.username = "guest_#{hash}"
+      attributes.username = "guest_#{h}"
     unique = @validate_unique attributes.username
     unless unique
       invalid() if invalid?
     else
-      attributes.id = hash
+      attributes.id = h
       user = new User(attributes)
       @list[user.id] = user
       success(user) if success?
