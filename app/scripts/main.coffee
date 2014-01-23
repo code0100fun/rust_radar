@@ -16,6 +16,7 @@ socket = io.connect(url)
 drawing = false
 clients = {}
 cursors = {}
+locations = {}
 canvas[0].width = $(window).width()
 canvas[0].height = $(window).height()
 
@@ -38,8 +39,10 @@ $('.users input.button').click =>
   user = {username,x,z}
   socket.emit('update_user', user) if !!user.username
 
+
+$edit_user = $('.edit-user')
+$edit_user.hide()
 toggle_edit_user = =>
-  $edit_user = $('.edit-user')
   if $edit_user.is(':visible')
     $edit_user.slideUp()
   else
@@ -71,23 +74,82 @@ new_chat_message = (username, message) ->
   # TODO - if chat was scrolled to bottom keep it there
   $messages[0].scrollTop = $messages[0].scrollHeight
 
+$(document).on 'mouseenter', '.pin', ->
+  $el = $(@)
+  user_id = $el.attr('data-user-id')
+  name_scope = "li[data-user-id='#{user_id}'],a[data-user-id='#{user_id}']"
+  $(name_scope).css('color':'red')
+  $el.css('background-color':'red')
+  false
+
+$(document).on 'mouseleave', '.pin', ->
+  $el = $(@)
+  user_id = $el.attr('data-user-id')
+  name_scope = "li[data-user-id='#{user_id}'],a[data-user-id='#{user_id}']"
+  $(name_scope).css('color':'')
+  $el.css('background-color':'')
+  false
+
+$(document).on 'mouseenter', '.username', ->
+  $el = $(@)
+  user_id = $el.attr('data-user-id')
+  pin_scope = ".pin[data-user-id='#{user_id}']"
+  $(pin_scope).css('background-color':'red')
+  $el.css('color':'red')
+  false
+
+$(document).on 'mouseleave', '.username', ->
+  $el = $(@)
+  user_id = $el.attr('data-user-id')
+  pin_scope = ".pin[data-user-id='#{user_id}']"
+  $(pin_scope).css('background-color':'')
+  $el.css('color':'')
+  false
+
 socket.on "update_users", (users) ->
+  locations = {}
+  $("#locations").empty()
   $users = $('.users')
   $list = $users.find('ul')
   $list.empty()
   for unique, user of users
+
     if !current_user || user.username != current_user.username
       $li = $('<li>')
-      $li.attr('data-username', user.username)
+      $li.addClass('username')
+      $li.attr('data-user-id', user.id)
       $li.text user.username
       $list.append($li)
+
+    unless locations[user.id]
+      $location = $("<div class=\"pin\" data-user-id=\"#{user.id}\">").appendTo("#locations")
+      name_scope = "li[data-user-id='#{user.id}']"
+      pin_scope = ".pin[data-user-id='#{user.id}']"
+      locations[user.id] = $location
+
+    if !user.x? || !user.z? || user.x == 0 || user.z == 0
+      $location.hide()
+    else
+      $location.show()
+
+    loc = map_to_canvas_coords user.x, user.z
+    $location = locations[user.id]
+    $location.css
+      left: loc.x - 7
+      top: loc.y - 7
+
 
 socket.on "update_user", (user) ->
   current_user = user
   username = current_user.username
-  $('.users input.username').val(username)
-  $('.users .current-user .username').text(username)
-  $('.users .names [data-username="'+username+'"]').remove()
+  $users = $('.users')
+  $users.find('input.username').val(username)
+  $users.find('input.user-x').val(user.x)
+  $users.find('input.user-z').val(user.z)
+  $current_username = $users.find('.current-user .username')
+  $current_username.text(username)
+  $current_username.attr('data-user-id', user.id)
+  $users.find('.names [data-user-id="'+user.id+'"]').remove()
   $.cookie('rustradar.username', username) unless user.generated
 
 socket.on "update_chat", (username, message) ->
@@ -118,6 +180,16 @@ canvas_to_map_coords = (cx, cy) ->
   mx = (cy * map_scale) + map_x_left
   mz = (cx * map_scale) + map_z_top
   {x:mx, z:mz}
+
+canvas.dblclick (e) ->
+  rect = canvas[0].getBoundingClientRect()
+  x = e.clientX - rect.left
+  y = e.clientY - rect.top
+  map_coords = canvas_to_map_coords x, y
+  x = map_coords.x
+  z = map_coords.z
+  user = {x,z}
+  socket.emit('update_user', user)
 
 lastEmit = $.now()
 doc.on "mousemove", (e) ->

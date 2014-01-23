@@ -25,14 +25,14 @@ class Users
 
   update: (user, attributes, success, invalid) ->
     valid = true
-    if user.username != attributes.username
+    if attributes.username && user.username != attributes.username
       attributes.generated = false
       valid = @validate_unique attributes.username
     unless valid
       invalid() if invalid?
     else
       delete attributes.id
-      user.update attributes if valid
+      user.update attributes
       success(user) if success?
       # mixpanel.track "update_username",
       #   previous: old_username

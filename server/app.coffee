@@ -29,7 +29,7 @@ app.use '/styles', express.static(buildDir + '/styles')
 app.use '/images', express.static(buildDir + '/images')
 app.use '/bower_components', express.static(buildDir + '/bower_components')
 app.set "views", appDir + "/views"
-app.engine "hamlc", haml.__express
+app.engine "haml", haml.__express
 app.set "view engine", "hamlc"
 app.use express.favicon()
 app.use express.logger("dev")
@@ -48,7 +48,7 @@ app.get "/:room_name", (req, res) ->
     room = rooms.create name:room_name
     insance = new Instance io, room
 
-  res.render "index.hamlc",
+  res.render "index.haml",
     room: room.name,
     mixpanel_key: mixpanel_key
 

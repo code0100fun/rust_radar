@@ -198,14 +198,27 @@ h3{
     color: #999;
 }
 
-#cursors{
+#cursors {
     position:relative;
     z-index: 100;
+    .cursor {
+        position:absolute;
+        width:15px;
+        height:22px;
+        background:url('../images/pointer.png') no-repeat -4px 0;
+    }
 }
 
-#cursors .cursor{
-    position:absolute;
-    width:15px;
-    height:22px;
-    background:url('../images/pointer.png') no-repeat -4px 0;
+#locations{
+    position:relative;
+    z-index: 50;
+    .pin {
+        position:absolute;
+        width:10px;
+        height:10px;
+        background-color: #0088ee;
+        border: 2px solid black;
+        border-radius:7px;
+    }
 }
+
