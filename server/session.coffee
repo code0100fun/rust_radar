@@ -23,13 +23,12 @@ class Session
   destroy_current_user: ->
     @instance.users.destroy @current_user.id
     @instance.send_all_users()
-    user = current_user()
     mixpanel.track "left_room",
       room_id: @instance.room.id,
       room_name: @instance.room.name,
       generated_room: @instance.room.generated
-      user_id: user.id
-      username: user.username
+      user_id: @current_user.id
+      username: @current_user.username
     # chat.emit "update_chat", "SERVER", socket.username + " has disconnected"
 
   update_user: (attributes) =>

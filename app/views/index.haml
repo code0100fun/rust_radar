@@ -33,7 +33,16 @@
       .names
         %ul
 
-    .location.dark.panel.panel-top-right
+    .change-room.dark.panel.panel-top-right
+      .room-form
+        %label
+          name:
+          %input.room-name{type: "text"}
+          %input.button{type: "button", value: "Change"}
+      %a.change-room{href:"#"}
+        Change Room
+
+    .location.dark.panel.panel-bottom-right
       %h3 Mouse Location:
       %p
         %span x:

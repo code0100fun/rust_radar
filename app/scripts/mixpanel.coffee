@@ -19,7 +19,7 @@
         h = a[1]
         )
         b[h] = ->
-          b.push [h].concat(Array::slice.call(arguments_, 0))
+          b.push [h].concat(Array::slice.call(arguments, 0))
       c = b
       (if "undefined" isnt typeof d then c = b[d] = [] else d = "mixpanel")
       c.people = c.people or []

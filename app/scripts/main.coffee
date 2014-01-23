@@ -48,9 +48,36 @@ toggle_edit_user = =>
   else
     $edit_user.slideDown()
 
-
 $('.users .current-user .username').click =>
   toggle_edit_user()
+  false
+
+$room_form = $('.change-room .room-form')
+$room_form.hide()
+toggle_change_room = =>
+  if $room_form.is(':visible')
+    $room_form.slideUp()
+  else
+    $room_form.slideDown()
+
+$room_button = $room_form.find('.button')
+$room_button.on 'click',  =>
+  submit_room_form()
+
+$room_name = $room_form.find('.room-name')
+$room_name.keyup (e) ->
+  if(e.keyCode == 13)
+    submit_room_form()
+
+submit_room_form = =>
+  room_name = $room_name.val()
+  change_room(room_name)
+
+change_room = (name) =>
+  window.location = "/#{name}"
+
+$('.change-room a.change-room').click =>
+  toggle_change_room()
   false
 
 $chat_field = $('.chat .input input')

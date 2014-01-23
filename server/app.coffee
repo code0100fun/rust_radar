@@ -49,7 +49,7 @@ app.get "/:room_name", (req, res) ->
   unless room?
     room = rooms.create name:room_name
     mixpanel.track "room_created",room
-    insance = new Instance io, room
+  room.insance ?= new Instance io, room
 
   res.render "index.haml",
     room: room.name,

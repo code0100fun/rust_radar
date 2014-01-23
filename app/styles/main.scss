@@ -52,6 +52,11 @@ a{
     left: 0;
 }
 
+.panel-bottom-right {
+    bottom: 0;
+    right: 0;
+}
+
 .panel-top-right {
     top: 0;
     right: 0;
@@ -75,7 +80,6 @@ a{
     }
     padding: 5px;
     bottom: 65px;
-    left: 5px;
     max-height: 200px;
     min-height: 30px;
     width: 350px;
@@ -104,10 +108,14 @@ a{
         }
     }
 }
-
+.change-room {
+    min-height: 10px;
+    min-width: 50px;
+}
 .location {
     min-height: 30px;
     min-width: 150px;
+    bottom: 65px;
 }
 
 .users {
