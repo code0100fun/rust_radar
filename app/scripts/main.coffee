@@ -141,6 +141,7 @@ socket.on "update_users", (users) ->
 
 socket.on "update_user", (user) ->
   current_user = user
+  mixpanel.alias(user.id)
   username = current_user.username
   $users = $('.users')
   $users.find('input.username').val(username)

@@ -1,4 +1,6 @@
 cookie = require('cookie')
+Mixpanel = require('mixpanel')
+mixpanel = Mixpanel.init(process.env.mixpanel_key)
 
 class Session
   constructor: (@socket, @instance) ->
@@ -8,11 +10,6 @@ class Session
     @socket.on "send_chat", @send_chat
     @socket.on "update_user", @update_user
     @socket.on "disconnect", @disconnect
-    # user = current_user()
-    # mixpanel.track "joined_room",
-    #   room_name: namespace,
-    #   generated_room: generated_room
-    #   username: user.username
 
   headers: ->
     @socket.handshake.headers
@@ -26,6 +23,13 @@ class Session
   destroy_current_user: ->
     @instance.users.destroy @current_user.id
     @instance.send_all_users()
+    user = current_user()
+    mixpanel.track "left_room",
+      room_id: @instance.room.id,
+      room_name: @instance.room.name,
+      generated_room: @instance.room.generated
+      user_id: user.id
+      username: user.username
     # chat.emit "update_chat", "SERVER", socket.username + " has disconnected"
 
   update_user: (attributes) =>
@@ -39,6 +43,12 @@ class Session
   user_create_success: (user) =>
     @current_user = user
     @user_updated_success()
+    mixpanel.track "joined_room",
+      room_id: @instance.room.id,
+      room_name: @instance.room.name,
+      generated_room: @instance.room.generated
+      user_id: user.id
+      username: user.username
 
   user_updated_success: (user) =>
     @send_current_user()

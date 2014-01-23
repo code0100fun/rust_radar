@@ -1,13 +1,12 @@
 Users = require('./users')
 Session = require('./session')
+Mixpanel = require('mixpanel')
+mixpanel = Mixpanel.init(process.env.mixpanel_key)
 
 class Instance
   constructor: (io, @room) ->
     @users = new Users
     @chat = io.of("/" + @room.name).on("connection", @connection)
-    # mixpanel.track "room_created",
-    #   room_name: namespace,
-    #   generated: generated_room
 
   connection: (socket) =>
     new Session socket, @
@@ -17,5 +16,11 @@ class Instance
 
   send_chat: (user, message) ->
     @chat.emit "update_chat", user.username, message
+    mixpanel.track "chat_sent",
+      user_id: user.id
+      username: user.username
+      room_id: @room.id
+      room_name: @room.name
+      message: message
 
 module.exports = Instance

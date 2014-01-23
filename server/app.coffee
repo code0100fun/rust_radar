@@ -6,6 +6,15 @@ io = require("socket.io").listen(server)
 haml = require("haml-coffee")
 jade = require("jade")
 cookie = require('cookie')
+
+if "production" is app.get("env")
+  process.env.mixpanel_key = "669a02e9b4e6b4efe1eface05261703b"
+  buildDir = path.join(__dirname, "../dist")
+else
+  process.env.mixpanel_key = "b8a72ab46f6a411eb4b9aee5e84ad917"
+  buildDir = path.join(__dirname, "../.tmp")
+  app.use express.errorHandler()
+
 Mixpanel = require('mixpanel')
 Rooms = require('./rooms')
 Instance = require('./instance')
@@ -14,15 +23,8 @@ rooms = new Rooms
 port = process.env.PORT or 9000
 
 appDir = path.join(__dirname, "../app")
-if "production" is app.get("env")
-  mixpanel_key = "669a02e9b4e6b4efe1eface05261703b"
-  buildDir = path.join(__dirname, "../dist")
-else
-  mixpanel_key = "b8a72ab46f6a411eb4b9aee5e84ad917"
-  buildDir = path.join(__dirname, "../.tmp")
-  app.use express.errorHandler()
 
-mixpanel = Mixpanel.init(mixpanel_key)
+mixpanel = Mixpanel.init(process.env.mixpanel_key)
 
 app.use '/scripts', express.static(buildDir + '/scripts')
 app.use '/styles', express.static(buildDir + '/styles')
@@ -46,10 +48,11 @@ app.get "/:room_name", (req, res) ->
   room = rooms.find name:room_name
   unless room?
     room = rooms.create name:room_name
+    mixpanel.track "room_created",room
     insance = new Instance io, room
 
   res.render "index.haml",
     room: room.name,
-    mixpanel_key: mixpanel_key
+    mixpanel_key: process.env.mixpanel_key
 
 server.listen port
