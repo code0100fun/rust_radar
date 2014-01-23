@@ -2,8 +2,39 @@
 var  path = require('path');
 module.exports = function (grunt) {
 
+    var spawn = grunt.util.spawn;
+
     require('load-grunt-tasks')(grunt);
     require('time-grunt')(grunt);
+
+    function shell() {
+        var args = Array.prototype.slice.call(arguments);
+        return function(cb) {
+            grunt.log.writeln(('Running `' + args.join(' ')+'`').green);
+            var child = spawn({
+                cmd: args[0],
+                args: args.slice(1),
+                opts: {
+                    cwd: __dirname
+                }
+            }, cb);
+            child.stderr.pipe(process.stderr);
+        };
+    }
+
+    grunt.registerTask('deploy:staging', '', function(){
+        grunt.log.writeln('Deploying to staging');
+        var done = this.async();
+        grunt.util.async.series([
+            shell('git','checkout',  '-b', 'tmp'),
+            shell('grunt','build'),
+            shell('git','add','-f','dist/'),
+            shell('git','commit','-m','"Build"'),
+            shell('git','push','-f','staging','tmp:master'),
+            shell('git','checkout','master'),
+            shell('git','branch','-D','tmp')
+        ], done);
+    });
 
     grunt.initConfig({
 
