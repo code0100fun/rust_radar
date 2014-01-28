@@ -145,21 +145,21 @@ module.exports = function (grunt) {
         },
 
         watch: {
-            express: {
-                files: [
-                    '<%= yeoman.app %>/{,*//*}*.html',
-                    '{<%= yeoman.dev %>,<%= yeoman.app %>}/styles/{,*//*}*.css',
-                    '{<%= yeoman.dev %>,<%= yeoman.app %>}/scripts/{,*//*}*.js',
-                    '<%= yeoman.app %>/images/{,*//*}*.{png,jpg,jpeg,gif,webp,svg}',
-                    'server.js',
-                    'server/{,*//*}*.{js,json}'
-                ],
-                tasks: ['express:dev'],
-                options: {
-                    livereload: true,
-                    nospawn: true
-                }
-            }
+            // express: {
+            //     files: [
+            //         '<%= yeoman.app %>/{,*//*}*.html',
+            //         '{<%= yeoman.dev %>,<%= yeoman.app %>}/styles/{,*//*}*.css',
+            //         '{<%= yeoman.dev %>,<%= yeoman.app %>}/scripts/{,*//*}*.js',
+            //         '<%= yeoman.app %>/images/{,*//*}*.{png,jpg,jpeg,gif,webp,svg}',
+            //         'server.js',
+            //         'server/{,*//*}*.{js,json}'
+            //     ],
+            //     tasks: ['express:dev'],
+            //     options: {
+            //         livereload: true,
+            //         nospawn: true
+            //     }
+            // }
         },
 
         copy: {
@@ -175,7 +175,8 @@ module.exports = function (grunt) {
                         '.htaccess',
                         'bower_components/**/*',
                         'images/{,*/}*.*',
-                        'styles/fonts/*'
+                        'styles/fonts/*',
+                        'scripts/**/*.js'
                     ]
                 }
                 ]
@@ -192,7 +193,8 @@ module.exports = function (grunt) {
                         '.htaccess',
                         'bower_components/**/*',
                         'images/{,*/}*.*',
-                        'styles/fonts/*'
+                        'styles/fonts/*',
+                        'scripts/**/*.js'
                     ]
                 }
                 ]

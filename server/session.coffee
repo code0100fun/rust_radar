@@ -63,6 +63,7 @@ class Session
   send_current_user: -> @socket.emit "update_user", @current_user
 
   mouse_move: (data) =>
+    console.log 'movine'
     @socket.broadcast.emit "moving", data
 
   send_chat: (message) =>

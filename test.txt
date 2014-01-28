@@ -1,0 +1,38 @@
+scale: 0.3360865815
+
+# Radtown east platform with chest (on chest spawn)
+# Actual
+6061, -3561
+
+# Measures:
+6074, -3612
+
+
+# Radtown north on the outside corner of the southeast wall
+5249, -4717
+
+# Measure
+5313.14, -4785.20
+
+
+scale: 0.33953866704635577 wrong!!!
+
+scale: 0.3326695932658974
+
+
+# p1 measure
+6050.47, -3642.17
+
+# p2 measure
+5251.30, -4847.76
+
+
+
+------------------
+
+# p1 measure
+
+
+# p2 measure
+
+

@@ -1,36 +1,87 @@
 doc = $(document)
 win = $(window)
 canvas = $("#canvas")
-ctx = canvas[0].getContext("2d")
+paper = null
+panZoom = null
+zoomStep = 0.05
+penColor = "#000"
+draw_id = null
+map = null
+map_z_left = -6505 #-208418.39 #-7200.0
+map_x_top = 3497.78 #-276504.19 # 2470.0
+map_scale_x = 0.3584695932658974
+map_scale_z = 0.3310695932658974
+zoom_scale = 1.0
+map_width = 16500
+map_height = 11857
+initial_zoom = 6
+max_zoom = 19.5
+
+resize = ->
+  w = map_width
+  h = map_height
+  ww = $(window).width()
+  wh = $(window).height()
+  if ww/wh < w/h
+    zoom_scale = ww/w
+    cw = ww
+    ch = ww * h/w
+  else
+    zoom_scale = wh/h
+    cw = wh * w/h
+    ch = wh
+
+  canvas.width(cw)
+  canvas.height(ch)
+  map.attr({width:cw,height:ch})
+
 instructions = $("#instructions")
-background = new Image()
-background.src = "images/map_large.jpg"
-background.onload = ->
-  canvas[0].width = background.width
-  canvas[0].height = background.height
-  ctx.drawImage background, 0, 0
+window.paper = paper = new Raphael(canvas[0], '100%', '100%')
+canvas.css('cursor','move')
+map = paper.image("images/map.jpg", 0, 0, map_width, map_height)
+resize()
+panZoom = paper.panzoom({ initialZoom: initial_zoom, zoomStep:zoomStep, maxZoom: max_zoom, initialPosition: { x: 120, y: 70} })
+panZoom.enable()
+
+$(window).resize resize
 
 url = location
-id = Math.round($.now() * Math.random())
 socket = io.connect(url)
 drawing = false
+
 clients = {}
+lines = {}
 cursors = {}
 locations = {}
-canvas[0].width = $(window).width()
-canvas[0].height = $(window).height()
-
 current_user = {}
 
-socket.on "moving", (data) ->
-  cursors[data.id] = $("<div class=\"cursor\">").appendTo("#cursors")  unless data.id of clients
-  cursors[data.id].css
-    left: data.x
-    top: data.y
+cursor = ->
+  paper.circle(2.5, 2.5, 5)
 
-  drawLine clients[data.id].x, clients[data.id].y, data.x, data.y  if data.drawing and clients[data.id]
-  clients[data.id] = data
-  clients[data.id].updated = $.now()
+socket.on "moving", (data) ->
+  cursors[data.id] = cursor() unless cursors[data.id]
+  zoomed = map_to_zoomed_coords data.x, data.z
+  console.log 'coords', zoomed
+  cursors[data.id].attr {cx:zoomed.x,cy:zoomed.y}
+  if data.drawing
+    lines[data.draw_id] = new_line(zoomed.x, zoomed.y, data.color) unless lines[data.draw_id]
+  # drawLine clients[data.id].x, clients[data.id].y, data.x, data.y  if data.drawing and clients[data.id]
+
+$('.tool.color').each (i,el) ->
+  $el = $(el)
+  $el.css('background-color', $el.attr('data-color'))
+  $el.click -> penColor = $el.attr('data-color')
+
+$pen = $('.tool.pen')
+$pen.click =>
+  if panZoom.enabled
+    $pen.addClass('selected')
+    panZoom.disable()
+    canvas.css('cursor','crosshair')
+  else
+    $pen.removeClass('selected')
+    panZoom.enable()
+    canvas.css('cursor','move')
 
 $('.users input.button').click =>
   username = $('.users input.username').val()
@@ -159,7 +210,7 @@ socket.on "update_users", (users) ->
     else
       $location.show()
 
-    loc = map_to_canvas_coords user.x, user.z
+    loc = map_to_zoomed_coords user.x, user.z
     $location = locations[user.id]
     $location.css
       left: loc.x - 7
@@ -184,36 +235,70 @@ socket.on "update_chat", (username, message) ->
   new_chat_message username, message
 
 prev = {}
+path = null
+pathString = null
+
+begin_path = (x,y) ->
+  pathString = 'M' + x + ' ' + y + 'l0 0'
+  path = paper.path(pathString)
+  path.attr({
+    'stroke': '#F00',
+    'stroke-linecap': 'round',
+    'stroke-linejoin': 'round',
+    'stroke-width': 1
+  })
+
+random = ->
+  Math.random().toString()
+
+random_hash = (length) ->
+  sha = new jsSHA(random(), "TEXT")
+  sha.getHash("SHA-1", "HEX").slice(0,length)
+
 canvas.on "mousedown", (e) ->
+  instructions.fadeOut()
+  return if panZoom.enabled
   e.preventDefault()
   drawing = true
-  prev.x = e.pageX
-  prev.y = e.pageY
-  instructions.fadeOut()
+  draw_id = random_hash(7)
+  zoomed = canvas_to_zoomed e.offsetX, e.offsetY
+  x = zoomed.x
+  y = zoomed.y
+  begin_path(x,y)
+  prev.x = x
+  prev.y = y
 
 doc.bind "mouseup mouseleave", ->
   drawing = false
 
 
-map_z_top = -7200.0
-map_x_left = 2470.0
-map_scale = 3.29
 
-map_to_canvas_coords = (mx, mz) ->
-  cx = (mz - map_z_top) / map_scale
-  cy = (mx - map_x_left) / map_scale
+canvas_to_zoomed = (cx, cy) ->
+  pan = panZoom.getCurrentPosition()
+  zoom = panZoom.getCurrentZoom()
+  zx = cx * (1.0 - (zoomStep * zoom))
+  zy = cy * (1.0 - (zoomStep * zoom))
+  zx = zx + pan.x
+  zy = zy + pan.y
+  zx = zx / zoom_scale
+  zy = zy / zoom_scale
+  {x:zx,y:zy}
+
+map_to_zoomed_coords = (mx, mz) ->
+  cx = (mz - map_z_left) / map_scale_z
+  cy = (mx - map_x_top) / map_scale_x
   {x:cx, y:cy}
 
-canvas_to_map_coords = (cx, cy) ->
-  mx = (cy * map_scale) + map_x_left
-  mz = (cx * map_scale) + map_z_top
+zoomed_to_map_coords = (cx, cy) ->
+  mx = (cy * map_scale_x) + map_x_top
+  mz = (cx * map_scale_z) + map_z_left
   {x:mx, z:mz}
 
 canvas.dblclick (e) ->
   rect = canvas[0].getBoundingClientRect()
   x = e.clientX - rect.left
   y = e.clientY - rect.top
-  map_coords = canvas_to_map_coords x, y
+  map_coords = zoomed_to_map_coords x, y
   x = map_coords.x
   z = map_coords.z
   user = {x,z}
@@ -221,37 +306,33 @@ canvas.dblclick (e) ->
 
 lastEmit = $.now()
 doc.on "mousemove", (e) ->
-  rect = canvas[0].getBoundingClientRect()
-  x = e.clientX - rect.left
-  y = e.clientY - rect.top
-  map_coords = canvas_to_map_coords x, y
+  zoom = panZoom.getCurrentZoom()
+  zoomed = canvas_to_zoomed e.offsetX, e.offsetY
+  map_coords = zoomed_to_map_coords zoomed.x, zoomed.y
   $('.map-x').text(map_coords.x.toFixed(2))
   $('.map-z').text(map_coords.z.toFixed(2))
   if $.now() - lastEmit > 30
     socket.emit "mousemove",
-      x: x
-      y: y
-      # raw_x: map_coords.x
-      # raw_z: map_coords.z
+      x: map_coords.x
+      z: map_coords.z
       drawing: drawing
-      id: id
+      draw_id: draw_id
 
-    lastEmit = $.now()
-  if drawing
-    drawLine prev.x, prev.y, x, y
-    prev.x = x
-    prev.y = y
+  return unless drawing
+  lastEmit = $.now()
+  drawLineTo zoomed.x, zoomed.y
 
 setInterval (->
-  for ident of clients
-    if $.now() - clients[ident].updated > 10000
-      cursors[ident].remove()
-      delete clients[ident]
+  # for ident of clients
+  #   if $.now() - clients[ident].updated > 10000
+  #     cursors[ident].remove()
+  #     delete clients[ident]
 
-      delete cursors[ident]
+  #     delete cursors[ident]
 ), 10000
 
-drawLine = (fromx, fromy, tox, toy) ->
-  ctx.moveTo fromx, fromy
-  ctx.lineTo tox, toy
-  ctx.stroke()
+drawLineTo = (x,y) ->
+  pathString += 'l' + (x - prev.x) + ' ' + (y - prev.y)
+  path.attr('path', pathString)
+  prev.x = x
+  prev.y = y
