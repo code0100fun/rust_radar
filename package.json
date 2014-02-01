@@ -25,7 +25,8 @@
     "grunt-contrib-coffee": "~0.8.2",
     "grunt-contrib-copy": "~0.5.0",
     "grunt-mocha-test": "~0.8.2",
-    "chai": "~1.8.1"
+    "chai": "~1.8.1",
+    "nightwatch": "~0.1.7"
   },
   "engines": {
     "node": ">=0.8.0"

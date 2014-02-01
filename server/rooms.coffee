@@ -1,7 +1,6 @@
 hash = require('./hash')
 Room = require('./room')
-Mixpanel = require('mixpanel')
-mixpanel = Mixpanel.init(process.env.mixpanel_key)
+Analytics = require('./analytics')
 
 class Rooms
   constructor: ->
@@ -18,7 +17,7 @@ class Rooms
     else
       @list[room.id] = room
       success(room) if success?
-      mixpanel.track "create_room", room
+      Analytics.track "create_room", room
       room
 
   unique_room_name: (room_name) ->

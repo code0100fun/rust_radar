@@ -1,7 +1,6 @@
 Users = require('./users')
 Session = require('./session')
-Mixpanel = require('mixpanel')
-mixpanel = Mixpanel.init(process.env.mixpanel_key)
+Analytics = require('./analytics')
 
 class Instance
   constructor: (io, @room) ->
@@ -16,7 +15,7 @@ class Instance
 
   send_chat: (user, message) ->
     @chat.emit "update_chat", user.username, message
-    mixpanel.track "chat_sent",
+    Analytics.track "chat_sent",
       user_id: user.id
       username: user.username
       room_id: @room.id

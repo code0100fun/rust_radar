@@ -1,6 +1,5 @@
 cookie = require('cookie')
-Mixpanel = require('mixpanel')
-mixpanel = Mixpanel.init(process.env.mixpanel_key)
+Analytics = require('./analytics')
 
 class Session
   constructor: (@socket, @instance) ->
@@ -24,7 +23,7 @@ class Session
   destroy_current_user: ->
     @instance.users.destroy @current_user.id
     @instance.send_all_users()
-    mixpanel.track "left_room",
+    Analytics.track "left_room",
       room_id: @instance.room.id,
       room_name: @instance.room.name,
       generated_room: @instance.room.generated
@@ -43,7 +42,7 @@ class Session
   user_create_success: (user) =>
     @current_user = user
     @user_updated_success()
-    mixpanel.track "joined_room",
+    Analytics.track "joined_room",
       room_id: @instance.room.id,
       room_name: @instance.room.name,
       generated_room: @instance.room.generated

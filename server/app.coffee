@@ -15,16 +15,14 @@ else
   buildDir = path.join(__dirname, "../.tmp")
   app.use express.errorHandler()
 
-Mixpanel = require('mixpanel')
 Rooms = require('./rooms')
 Instance = require('./instance')
+Analytics = require('./analytics')
 
 rooms = new Rooms
 port = process.env.PORT or 9000
 
 appDir = path.join(__dirname, "../app")
-
-mixpanel = Mixpanel.init(process.env.mixpanel_key)
 
 app.use '/scripts', express.static(buildDir + '/scripts')
 app.use '/styles', express.static(buildDir + '/styles')
@@ -48,7 +46,7 @@ app.get "/:room_name", (req, res) ->
   room = rooms.find name:room_name
   unless room?
     room = rooms.create name:room_name
-    mixpanel.track "room_created",room
+    Analytics.track "room_created",room
   room.insance ?= new Instance io, room
 
   res.render "index.haml",

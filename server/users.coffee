@@ -1,7 +1,6 @@
 User = require './user'
 hash = require('./hash')
-Mixpanel = require('mixpanel')
-mixpanel = Mixpanel.init(process.env.mixpanel_key)
+Analytics = require('./analytics')
 
 class Users
   constructor: ->
@@ -36,7 +35,7 @@ class Users
     else
       delete attributes.id
       if updated_username?
-        mixpanel.track "update_username",
+        Analytics.track "update_username",
           previous: user.username
           username: attributes.username
           generated: user.generated
@@ -44,7 +43,7 @@ class Users
       updated_user = @find id: user.id
       success(updated_user) if success?
       if attributes.x? || attributes.z?
-        mixpanel.track "update_location",
+        Analytics.track "update_location",
           previous_x: user.x
           previous_z: user.z
           x: attributes.x
@@ -71,7 +70,7 @@ class Users
       user = new User(attributes)
       @list[user.id] = user
       success(user) if success?
-      mixpanel.track "create_user", user
+      Analytics.track "create_user", user
       user
 
   first: ->

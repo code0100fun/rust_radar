@@ -1,4 +1,4 @@
-Users = require('../server/users')
+Users = require('../../server/users')
 expect = require('chai').expect
 
 describe 'Users', () ->
