@@ -7,6 +7,7 @@ class Session
     attributes = {username: @default_username()}
     @instance.users.create attributes, @user_create_success, @user_create_invalid
     @socket.on "mousemove", @mouse_move
+    @socket.on "draw", @draw
     @socket.on "send_chat", @send_chat
     @socket.on "update_user", @update_user
     @socket.on "disconnect", @disconnect
@@ -63,8 +64,10 @@ class Session
   send_current_user: -> @socket.emit "update_user", @current_user
 
   mouse_move: (data) =>
-    console.log 'movine'
     @socket.broadcast.emit "moving", data
+
+  draw: (data) =>
+    @socket.broadcast.emit "drawing", data
 
   send_chat: (message) =>
     @instance.send_chat @current_user, message

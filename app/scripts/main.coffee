@@ -54,18 +54,55 @@ lines = {}
 cursors = {}
 locations = {}
 current_user = {}
+draw_buffer = []
 
 cursor = ->
   paper.circle(2.5, 2.5, 5)
 
+pin = ->
+  circle = paper.circle(2.5, 2.5, 5)
+  circle.attr({
+    'fill' : '#0088ee'
+  })
+  circle
+
+new_line = (x, y, color='#000') ->
+  path_string = 'M' + x + ' ' + y + 'l0 0'
+  path = paper.path(path_string)
+  path.attr({
+    'stroke': color,
+    'stroke-linecap': 'round',
+    'stroke-linejoin': 'round',
+    'stroke-width': 1
+  })
+  { path:path, path_string: path_string, prev: {x:x,y:y} }
+
+
+line_to = (line, x, y) ->
+  line.path_string += 'l' + (x - line.prev.x) + ' ' + (y - line.prev.y)
+  # line.path_string += 'L' + x + ' ' + y
+  line.path.attr('path', line.path_string)
+  line.prev.x = x
+  line.prev.y = y
+
 socket.on "moving", (data) ->
   cursors[data.id] = cursor() unless cursors[data.id]
+  cursors[data.id].updated = $.now()
   zoomed = map_to_zoomed_coords data.x, data.z
-  console.log 'coords', zoomed
   cursors[data.id].attr {cx:zoomed.x,cy:zoomed.y}
-  if data.drawing
-    lines[data.draw_id] = new_line(zoomed.x, zoomed.y, data.color) unless lines[data.draw_id]
-  # drawLine clients[data.id].x, clients[data.id].y, data.x, data.y  if data.drawing and clients[data.id]
+
+socket.on "drawing", (data) ->
+  unless lines[data.id]
+    point = data.points.shift()
+    if point?
+      zoomed = map_to_zoomed_coords point.x, point.z
+      lines[data.id] = new_line(zoomed.x, zoomed.y, data.color)
+
+  line = lines[data.id]
+  for point in data.points
+    zoomed = map_to_zoomed_coords point.x, point.z
+    line_to line, zoomed.x, zoomed.y
+
 
 $('.tool.color').each (i,el) ->
   $el = $(el)
@@ -185,8 +222,6 @@ $(document).on 'mouseleave', '.username', ->
   false
 
 socket.on "update_users", (users) ->
-  locations = {}
-  $("#locations").empty()
   $users = $('.users')
   $list = $users.find('ul')
   $list.empty()
@@ -200,21 +235,18 @@ socket.on "update_users", (users) ->
       $list.append($li)
 
     unless locations[user.id]
-      $location = $("<div class=\"pin\" data-user-id=\"#{user.id}\">").appendTo("#locations")
+      location = pin()
+      location.attr('data-user-id',user.id)
       name_scope = "li[data-user-id='#{user.id}']"
-      pin_scope = ".pin[data-user-id='#{user.id}']"
-      locations[user.id] = $location
+      pin_scope = "path[data-user-id='#{user.id}']"
+      locations[user.id] = location
 
-    if !user.x? || !user.z? || user.x == 0 || user.z == 0
-      $location.hide()
-    else
-      $location.show()
-
-    loc = map_to_zoomed_coords user.x, user.z
-    $location = locations[user.id]
-    $location.css
-      left: loc.x - 7
-      top: loc.y - 7
+    unless !user.x? || !user.z? || user.x == 0 || user.z == 0
+      loc = map_to_zoomed_coords user.x, user.z
+      location = locations[user.id]
+      location.attr
+        cx: loc.x
+        cy: loc.y
 
 
 socket.on "update_user", (user) ->
@@ -236,13 +268,13 @@ socket.on "update_chat", (username, message) ->
 
 prev = {}
 path = null
-pathString = null
+path_string = null
 
-begin_path = (x,y) ->
-  pathString = 'M' + x + ' ' + y + 'l0 0'
-  path = paper.path(pathString)
+begin_path = (x,y, color='#000') ->
+  path_string = 'M' + x + ' ' + y + 'l0 0'
+  path = paper.path(path_string)
   path.attr({
-    'stroke': '#F00',
+    'stroke': color,
     'stroke-linecap': 'round',
     'stroke-linejoin': 'round',
     'stroke-width': 1
@@ -264,14 +296,13 @@ canvas.on "mousedown", (e) ->
   zoomed = canvas_to_zoomed e.offsetX, e.offsetY
   x = zoomed.x
   y = zoomed.y
-  begin_path(x,y)
+  begin_path(x, y, penColor)
   prev.x = x
   prev.y = y
 
 doc.bind "mouseup mouseleave", ->
+  send_drawing()
   drawing = false
-
-
 
 canvas_to_zoomed = (cx, cy) ->
   pan = panZoom.getCurrentPosition()
@@ -280,8 +311,6 @@ canvas_to_zoomed = (cx, cy) ->
   zy = cy * (1.0 - (zoomStep * zoom))
   zx = zx + pan.x
   zy = zy + pan.y
-  zx = zx / zoom_scale
-  zy = zy / zoom_scale
   {x:zx,y:zy}
 
 map_to_zoomed_coords = (mx, mz) ->
@@ -295,44 +324,50 @@ zoomed_to_map_coords = (cx, cy) ->
   {x:mx, z:mz}
 
 canvas.dblclick (e) ->
-  rect = canvas[0].getBoundingClientRect()
-  x = e.clientX - rect.left
-  y = e.clientY - rect.top
-  map_coords = zoomed_to_map_coords x, y
+  zoomed = canvas_to_zoomed e.offsetX, e.offsetY
+  map_coords = zoomed_to_map_coords zoomed.x, zoomed.y
   x = map_coords.x
   z = map_coords.z
   user = {x,z}
   socket.emit('update_user', user)
 
-lastEmit = $.now()
+lastMove = $.now()
 doc.on "mousemove", (e) ->
-  zoom = panZoom.getCurrentZoom()
   zoomed = canvas_to_zoomed e.offsetX, e.offsetY
   map_coords = zoomed_to_map_coords zoomed.x, zoomed.y
   $('.map-x').text(map_coords.x.toFixed(2))
   $('.map-z').text(map_coords.z.toFixed(2))
-  if $.now() - lastEmit > 30
+  if $.now() - lastMove > 30
     socket.emit "mousemove",
       x: map_coords.x
       z: map_coords.z
-      drawing: drawing
-      draw_id: draw_id
+    lastMove = $.now()
 
   return unless drawing
-  lastEmit = $.now()
+  draw_buffer.push map_coords
+  if $.now() - lastDraw > 300
+    send_drawing()
+
   drawLineTo zoomed.x, zoomed.y
 
-setInterval (->
-  # for ident of clients
-  #   if $.now() - clients[ident].updated > 10000
-  #     cursors[ident].remove()
-  #     delete clients[ident]
+lastDraw = $.now()
+send_drawing = ->
+  socket.emit "draw",
+    points: draw_buffer
+    id: draw_id
+    color: penColor
+  lastDraw = $.now()
+  draw_buffer = []
 
-  #     delete cursors[ident]
+setInterval (->
+  for id, c of cursors
+    if $.now() - c.updated > 10000
+      c.remove()
+      delete cursors[id]
 ), 10000
 
 drawLineTo = (x,y) ->
-  pathString += 'l' + (x - prev.x) + ' ' + (y - prev.y)
-  path.attr('path', pathString)
+  path_string += 'l' + (x - prev.x) + ' ' + (y - prev.y)
+  path.attr('path', path_string)
   prev.x = x
   prev.y = y
