@@ -48,6 +48,34 @@ module.exports = function (grunt) {
             }
         },
 
+        emblem: {
+            compile: {
+                files: {
+                    '<%= yeoman.dev %>/scripts/template.js': ['app/scripts/templates/**/*.emblem']
+                },
+                options: {
+                    root: 'app/scripts/templates/',
+                    dependencies: {
+                        jquery: 'app/bower_components/jquery/jquery.js',
+                        ember: 'app/bower_components/ember/ember.js',
+                        emblem: 'app/bower_components/emblem/dist/emblem.js',
+                        handlebars: 'app/bower_components/handlebars/handlebars.js'
+                    }
+                }
+            }
+        },
+
+        // emberTemplates: {
+        //     compile: {
+        //         options: {
+        //             templateBasePath: /app\/scripts\/templates\//
+        //         },
+        //         files: {
+        //             "<%= yeoman.dev %>/scripts/template.js": "app/scripts/templates/**/*.handlebars"
+        //         }
+        //     }
+        // },
+
         express: {
             options: {
                 cmd: 'coffee',
@@ -207,6 +235,8 @@ module.exports = function (grunt) {
     grunt.registerTask('server', [
         'clean:server',
         'coffee:dev',
+        // 'emberTemplates',
+        'emblem',
         'compass:server',
         'copy:dev',
         'express:dev',

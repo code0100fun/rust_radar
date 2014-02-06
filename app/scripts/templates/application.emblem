@@ -1,0 +1,4 @@
+outlet "map"
+/* render "instructions" */
+
+outlet "users"

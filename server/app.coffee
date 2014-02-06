@@ -6,6 +6,8 @@ io = require("socket.io").listen(server)
 haml = require("haml-coffee")
 jade = require("jade")
 cookie = require('cookie')
+holla = require('holla')
+rtc = holla.createServer(server)
 
 if "production" is app.get("env")
   process.env.mixpanel_key = "669a02e9b4e6b4efe1eface05261703b"

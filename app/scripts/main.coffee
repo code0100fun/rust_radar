@@ -225,8 +225,7 @@ socket.on "update_users", (users) ->
   $users = $('.users')
   $list = $users.find('ul')
   $list.empty()
-  for unique, user of users
-
+  for user in users
     if !current_user || user.username != current_user.username
       $li = $('<li>')
       $li.addClass('username')
@@ -254,12 +253,12 @@ socket.on "update_user", (user) ->
   mixpanel.alias(user.id)
   username = current_user.username
   $users = $('.users')
-  $users.find('input.username').val(username)
-  $users.find('input.user-x').val(user.x)
-  $users.find('input.user-z').val(user.z)
-  $current_username = $users.find('.current-user .username')
-  $current_username.text(username)
-  $current_username.attr('data-user-id', user.id)
+  # $users.find('input.username').val(username)
+  # $users.find('input.user-x').val(user.x)
+  # $users.find('input.user-z').val(user.z)
+  # $current_username = $users.find('.current-user .username')
+  # $current_username.text(username)
+  # $current_username.attr('data-user-id', user.id)
   $users.find('.names [data-user-id="'+user.id+'"]').remove()
   $.cookie('rustradar.username', username) unless user.generated
 
@@ -371,3 +370,4 @@ drawLineTo = (x,y) ->
   path.attr('path', path_string)
   prev.x = x
   prev.y = y
+

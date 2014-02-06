@@ -9,99 +9,22 @@
     %link{href: "bower_components/components-font-awesome/css/font-awesome.css", rel: "stylesheet"}
     %link{href: "styles/main.css", rel: "stylesheet"}
   %body
-    #cursors
-    #locations
-    #canvas
-    %hgroup#instructions
-      %h1 Draw on the map!!
-      %h2 Everyone in this room will see your drawing
-      %h3 Tip: you can change the room name in the address bar
-      %h3 Tip: if the map gets cluttered, simply reload the page
 
-    .users.dark.panel.panel-top-left
-      .edit-user
-        %label
-          x:
-          %input.user-x{type: "text"}
-        %label
-          z:
-          %input.user-z{type: "text"}
-        %p
-          %input.username{type: "text"}
-          %input.button{type: "button", value: "Update"}
-      .current-user
-        %a.username{href:"#"}
-      .names
-        %ul
 
-    .change-room.dark.panel.panel-top-right
-      .room-form
-        %label
-          name:
-          %input.room-name{type: "text"}
-          %input.button{type: "button", value: "Change"}
-      %a.change-room{href:"#"}
-        Change Room
-
-    .tools.dark.panel.panel-bottom-right
-      .tool.pen
-        %i.fa.fa-pencil.fa-2
-      .tool.color{"data-color":"#f00"}
-      .tool.color{"data-color":"#0f0"}
-      .tool.color{"data-color":"#00f"}
-
-    .location.dark.panel.panel-bottom-right
-      %h3 Mouse Location:
-      %p
-        %span x:
-        %span.map-x ?
-        %span ,
-        %span z:
-        %span.map-z ?
-
-    .chat.dark.panel.panel-bottom-left
-      .header
-        %h2 Chat
-      .messages
-      .input
-        %input{type:"text"}
-
-    .footer.dark.panel.panel-bottom
-      .left
-        %p &copy; 2014 RustRadar.com
-        %p Developed by:
-          %span
-            %a{href: "https://twitter.com/code0100fun", target:"_blank"} @code0100fun
-          %span and
-            %a{href: "https://twitter.com/scripterio", target:"_blank"} @scripterio
-        %p Map by:
-          %span
-            AlphaCheeto
-            -# %a{href: "https://twitter.com/brandy_92", target:"_blank"} @brandy_92
-
-      .left
-        %span.center-message Like Rust, this site is still VERY alpha.
-
-      .right
-        %span Bitcoins:
-          %p 14nL14KCoTbGN7VVSrwk51RyGKrBvmY5xM
-      .right.donate-paypal
-        %form{action: "https://www.paypal.com/cgi-bin/webscr", method: "post", target: "_blank"}
-          %input{name: "cmd", type: "hidden", value: "_s-xclick"}
-          %input{name: "hosted_button_id", type: "hidden", value: "78UF8G8AS4VUU"}
-          %input{alt: "PayPal - The safer, easier way to pay online!", border: "0", name: "submit", src: "https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif", type: "image"}
-          %img{alt: "", border: "0", height: "1", src: "https://www.paypalobjects.com/en_US/i/scr/pixel.gif", width: "1"}
-
+    %script{src: "http://simplewebrtc.com/latest.js"}
     %script{src: "bower_components/jquery/jquery.js"}
+    %script{src: "bower_components/handlebars/handlebars.js"}
+    %script{src: "bower_components/ember/ember.js"}
+    -# %script{src: "bower_components/ember-data/ember-data.js"}
     %script{src: "bower_components/socket.io-client/dist/socket.io.js"}
     %script{src: "bower_components/jquery-cookie/jquery.cookie.js"}
     %script{src: "bower_components/raphael/raphael.js"}
-    -# %script{src: "bower_components/raphael.pan-zoom/index.js"}
-    %script{src: "scripts/raphael.pan-zoom.js"}
+    %script{src: "scripts/vendor/raphael.pan-zoom.js"}
     %script{src: "bower_components/jsSHA/src/sha1.js"}
-    /* %script{src: "scripts/livereload.js"} */
-    %script{src: "scripts/main.js"}
-    %script{src: "scripts/mixpanel.js"}
+    %script{src: "scripts/template.js"}
+    %script{src: "scripts/config/application.js"}
+    -# %script{src: "scripts/main.js"}
+    %script{src: "scripts/vendor/mixpanel.js"}
     :javascript
       var mixpanel_key = '#{@mixpanel_key}';
       mixpanel.init(mixpanel_key);

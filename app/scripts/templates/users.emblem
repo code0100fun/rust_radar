@@ -1,0 +1,8 @@
+.users.dark.panel.panel-top-left
+  /* render "edit_user" */
+  /* .current-user */
+  /*   a.username{action "toggleEdit"} = current_user */
+  .names
+      ul
+        each user in users
+          li = user.username

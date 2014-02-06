@@ -1,0 +1,10 @@
+.edit-user
+  label
+    x
+    Ember.TextField valueBinding="current_user.x"
+  label
+    z
+    Ember.TextField valueBinding="current_user.z"
+  p
+    Ember.TextField valueBinding="current_user.username"
+    button{action "update"} Update
