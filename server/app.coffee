@@ -26,7 +26,7 @@ appDir = path.join(__dirname, "../app")
 
 app.use '/scripts', express.static(buildDir + '/scripts')
 app.use '/styles', express.static(buildDir + '/styles')
-app.use '/images', express.static(buildDir + '/images')
+app.use '/images', express.static(appDir + '/images')
 app.use '/bower_components', express.static(buildDir + '/bower_components')
 app.set "views", appDir + "/views"
 app.engine "haml", haml.__express

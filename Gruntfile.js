@@ -7,35 +7,6 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
     require('time-grunt')(grunt);
 
-    function shell() {
-        var args = Array.prototype.slice.call(arguments);
-        return function(cb) {
-            grunt.log.writeln(('Running `' + args.join(' ')+'`').green);
-            var child = spawn({
-                cmd: args[0],
-                args: args.slice(1),
-                opts: {
-                    cwd: __dirname
-                }
-            }, cb);
-            child.stderr.pipe(process.stderr);
-        };
-    }
-
-    grunt.registerTask('deploy:staging', '', function(){
-        grunt.log.writeln('Deploying to staging');
-        var done = this.async();
-        grunt.util.async.series([
-            shell('git','checkout',  '-b', 'tmp'),
-            shell('grunt','build'),
-            shell('git','add','-f','dist/'),
-            shell('git','commit','-m','"Build"'),
-            shell('git','push','-f','staging','tmp:master'),
-            shell('git','checkout','master'),
-            shell('git','branch','-D','tmp')
-        ], done);
-    });
-
     grunt.initConfig({
 
         browserify: {
@@ -112,71 +83,19 @@ module.exports = function (grunt) {
             }
         },
 
-        // emberTemplates: {
-        //     compile: {
-        //         options: {
-        //             templateBasePath: /app\/scripts\/templates\//
-        //         },
-        //         files: {
-        //             "<%= yeoman.dev %>/scripts/template.js": "app/scripts/templates/**/*.handlebars"
-        //         }
-        //     }
-        // },
-
         express: {
             options: {
                 cmd: 'coffee',
                 port: process.env.PORT || 9000
             },
-            dev: {
+            server: {
                 options: {
                     script: 'server/app.coffee'
                 }
             },
-            prod: {
-                options: {
-                    script: 'server/app.coffee'
-                }
-            }
-        },
-
-        coffee: {
-            dev: {
-                files: [{
-                    expand: true,
-                    cwd: '<%= yeoman.app %>/scripts',
-                    src: '{,*/}*.coffee',
-                    dest: '<%= yeoman.dev %>/scripts',
-                    ext: '.js'
-                }]
-            },
-            dist: {
-                files: [{
-                    expand: true,
-                    cwd: '<%= yeoman.app %>/scripts',
-                    src: '{,*/}*.coffee',
-                    dest: '<%= yeoman.dist %>/scripts',
-                    ext: '.js'
-                }]
-            },
-            test: {
-                files: [{
-                    expand: true,
-                    cwd: 'test/spec',
-                    src: '{,*/}*.coffee',
-                    dest: '<%= yeoman.dev %>/spec',
-                    ext: '.js'
-                }]
-            }
         },
 
         compass: {
-            dist: {
-                options: {
-                    cssDir: '<%= yeoman.dist %>/styles',
-                    environment: 'production'
-                }
-            },
             options: {
                 sassDir: '<%= yeoman.app %>/styles',
                 cssDir: '<%= yeoman.dev %>/styles',
@@ -194,7 +113,6 @@ module.exports = function (grunt) {
         yeoman: {
             app: 'app',
             dev: '.tmp',
-            dist: 'dist'
         },
 
         open: {
@@ -210,8 +128,6 @@ module.exports = function (grunt) {
                     dot: true,
                     src: [
                         '<%= yeoman.dev %>',
-                        '<%= yeoman.dist %>/*',
-                        '!<%= yeoman.dist %>/.git*'
                     ]
                 }
                 ]
@@ -237,79 +153,27 @@ module.exports = function (grunt) {
             // }
         },
 
-        copy: {
-            dev: {
-                files: [
-                    {
-                    expand: true,
-                    dot: true,
-                    cwd: '<%= yeoman.app %>',
-                    dest: '<%= yeoman.dev %>',
-                    src: [
-                        '*.{ico,txt}',
-                        '.htaccess',
-                        'bower_components/**/*',
-                        'images/{,*/}*.*',
-                        'styles/fonts/*',
-                        'scripts/**/*.js'
-                    ]
-                }
-                ]
-            },
-            dist: {
-                files: [
-                    {
-                    expand: true,
-                    dot: true,
-                    cwd: '<%= yeoman.app %>',
-                    dest: '<%= yeoman.dist %>',
-                    src: [
-                        '*.{ico,txt}',
-                        '.htaccess',
-                        'bower_components/**/*',
-                        'images/{,*/}*.*',
-                        'styles/fonts/*',
-                        'scripts/**/*.js'
-                    ]
-                }
-                ]
-            }
-        }
-
-
     });
 
-    grunt.registerTask('server', [
+    grunt.registerTask('build', [
         'clean:server',
-        'coffee:dev',
         'emblem',
         'compass:server',
-        'copy:dev',
         'browserify:dev',
         'uglify:dev',
-        'express:dev',
+    ]);
+
+    grunt.registerTask('server', [
+        'build',
+        'express:server',
         // 'open',
         'watch'
     ]);
 
-    grunt.registerTask('build', [
-        'clean:dist',
-        'coffee:dist',
-        'compass:dist',
-        'copy:dist',
-        'browserify:dist',
-        'uglify:dist',
+
+    grunt.registerTask('heroku', [
+        'build'
     ]);
 
     grunt.registerTask('default', 'mochaTest');
-
-    grunt.registerTask('heroku', [
-        'clean:server',
-        'coffee:dev',
-        'emblem',
-        'compass:server',
-        'copy:dev',
-        'browserify:dev',
-        'uglify:dev',
-    ]);
 };
