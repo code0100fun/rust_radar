@@ -6,16 +6,14 @@ io = require("socket.io").listen(server)
 haml = require("haml-coffee")
 jade = require("jade")
 cookie = require('cookie')
-holla = require('holla')
-rtc = holla.createServer(server)
 
 if "production" is app.get("env")
   process.env.mixpanel_key = "669a02e9b4e6b4efe1eface05261703b"
-  buildDir = path.join(__dirname, "../dist")
 else
   process.env.mixpanel_key = "b8a72ab46f6a411eb4b9aee5e84ad917"
-  buildDir = path.join(__dirname, "../.tmp")
   app.use express.errorHandler()
+
+buildDir = path.join(__dirname, "../.tmp")
 
 Rooms = require('./rooms')
 Instance = require('./instance')

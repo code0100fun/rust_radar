@@ -38,6 +38,53 @@ module.exports = function (grunt) {
 
     grunt.initConfig({
 
+        browserify: {
+            dev: {
+                files: {
+                    '<%= yeoman.dev %>/scripts/bundle.js' : [
+                        'app/scripts/**/*.coffee'
+                    ]
+                },
+                options: {
+                    alias: [
+                        '<%= yeoman.dev %>/scripts/template.js:templates',
+                        'app/scripts/vendor/raphael.pan-zoom.js:raphael.pan-zoom',
+                    ],
+                    shim: {
+                        ember: {
+                            path: './app/bower_components/ember/ember.js',
+                            exports:'Ember'
+                        },
+                        jquery: {
+                            path: './app/bower_components/jquery/jquery.js',
+                            exports:'jQuery'
+                        },
+                        raphael: {
+                            path: './app/bower_components/raphael/raphael.js',
+                            exports:'Raphael'
+                        },
+                    },
+                    transform: ['coffeeify'],
+                    noParse: [
+                        'raphael'
+                    ]
+                }
+            }
+        },
+
+        uglify: {
+            dev: {
+                files: {
+                    '<%= yeoman.dev %>/scripts/bundle.js': ['<%= yeoman.dev %>/scripts/bundle.js']
+                }
+            },
+            dist: {
+                files: {
+                    '<%= yeoman.app %>/scripts/bundle.js': ['<%= yeoman.app %>/scripts/bundle.js']
+                }
+            }
+        },
+
         mochaTest: {
             test: {
                 options: {
@@ -235,10 +282,11 @@ module.exports = function (grunt) {
     grunt.registerTask('server', [
         'clean:server',
         'coffee:dev',
-        // 'emberTemplates',
         'emblem',
         'compass:server',
         'copy:dev',
+        'browserify:dev',
+        'uglify:dev',
         'express:dev',
         // 'open',
         'watch'
@@ -249,7 +297,19 @@ module.exports = function (grunt) {
         'coffee:dist',
         'compass:dist',
         'copy:dist',
+        'browserify:dist',
+        'uglify:dist',
     ]);
 
     grunt.registerTask('default', 'mochaTest');
+
+    grunt.registerTask('heroku:production', [
+        'clean:server',
+        'coffee:dev',
+        'emblem',
+        'compass:server',
+        'copy:dev',
+        'browserify:dev',
+        'uglify:dev',
+    ]);
 };

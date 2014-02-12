@@ -1,4 +1,6 @@
 outlet "map"
-/* render "instructions" */
 
+/* render "instructions" */
 outlet "users"
+
+outlet "rtc"

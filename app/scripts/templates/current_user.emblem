@@ -1,0 +1,2 @@
+.current-user
+  a.username{action "toggleEdit"} = currentUser.username
