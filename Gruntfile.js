@@ -303,7 +303,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('default', 'mochaTest');
 
-    grunt.registerTask('heroku:production', [
+    grunt.registerTask('heroku', [
         'clean:server',
         'coffee:dev',
         'emblem',
