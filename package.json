@@ -1,6 +1,11 @@
 {
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/code0100fun/rust_radar.git"
+  },
+  "homepage": "http://www.rustradar.com",
   "name": "rust-radar",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "dependencies": {
     "socket.io": "~0.9.16",
     "express": "~3.4.7",
@@ -12,9 +17,7 @@
     "handlebars": "~1.3.0",
     "ember-template-compiler": "~1.4.0-beta.1",
     "grunt-ember-templates": "~0.4.18",
-    "jquery": "~2.1.0"
-  },
-  "devDependencies": {
+    "jquery": "~2.1.0",
     "grunt": "~0.4.1",
     "grunt-bower-install": "~0.8.0",
     "grunt-contrib-watch": "~0.5.3",
@@ -40,6 +43,8 @@
     "simplewebrtc": "~1.1.1",
     "socket.io-client": "~0.9.16",
     "handlebars": "~1.3.0"
+  },
+  "devDependencies": {
   },
   "engines": {
     "node": ">=0.8.0"
