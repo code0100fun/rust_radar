@@ -34,6 +34,14 @@ module.exports = function (grunt) {
                             path: './app/bower_components/raphael/raphael.js',
                             exports:'Raphael'
                         },
+                        bootstrap: {
+                            path: './app/bower_components/bootstrap/dist/js/bootstrap.js',
+                            exports: null
+                        },
+                        equalHeights: {
+                            path: './app/bower_components/jquery.equalheights/jquery.equalheights.js',
+                            exports: null
+                        }
                     },
                     transform: ['coffeeify'],
                     noParse: [
@@ -95,18 +103,21 @@ module.exports = function (grunt) {
             },
         },
 
-        compass: {
-            options: {
-                sassDir: '<%= yeoman.app %>/styles',
-                cssDir: '<%= yeoman.dev %>/styles',
-                importPath: '<%= yeoman.app %>/bower_components',
-                javascriptsDir: '<%= yeoman.app %>/scripts',
-                httpImagesPath: '<%= yeoman.app %>/images'
-            },
-            server: {
-                options: {
-                    debugInfo: true
+        sass: {
+            dist: {
+                files: {
+                    '<%= yeoman.dev %>/styles/main.css':'<%= yeoman.app %>/styles/main.scss'
                 }
+            }
+        },
+
+        concat: {
+            css: {
+                src: [
+                    '<%= yeoman.app %>/bower_components/bootstrap/dist/css/bootstrap.css',
+                    '<%= yeoman.dev %>/styles/main.css',
+                ],
+                dest: '<%= yeoman.dev %>/styles/main.css'
             }
         },
 
@@ -158,9 +169,9 @@ module.exports = function (grunt) {
     grunt.registerTask('build', [
         'clean:server',
         'emblem',
-        'compass:server',
+        'sass',
+        'concat:css',
         'browserify:dev',
-        'uglify:dev',
     ]);
 
     grunt.registerTask('server', [
@@ -172,7 +183,8 @@ module.exports = function (grunt) {
 
 
     grunt.registerTask('heroku', [
-        'build'
+        'build',
+        'uglify:dev',
     ]);
 
     grunt.registerTask('default', 'mochaTest');

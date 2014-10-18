@@ -1,0 +1,6 @@
+p.message
+  view App.FromNowView valueBinding="message.timestamp"
+  span.separator -
+  span.username = message.username
+  span.separator :
+  span.content = message.content

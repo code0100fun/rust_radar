@@ -1,6 +1,6 @@
-.users.dark.panel.panel-top-left
+.users.dark.shadow-bottom-right
   partial "currentUser"
   .names
-      ul
-        each user in users
-          li = user.username
+    ul
+      each user in users
+        li = user.username

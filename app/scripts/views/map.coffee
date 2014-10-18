@@ -6,8 +6,8 @@ App.MapView = Ember.View.extend
   resize: ->
     w = @get('mapWidth')
     h = @get('mapHeight')
-    ww = $(window).width()
-    wh = $(window).height()
+    ww = @$().parent().width()
+    wh = $(window).height() - 32
     if ww/wh < w/h
       zoomScale = ww/w
       cw = ww
@@ -44,3 +44,6 @@ App.MapView = Ember.View.extend
     @set('map', map)
     @set('panZoom', panZoom)
     @resize()
+    @$().addClass('equal-height')
+    # @$().addClass('equal-height-master')
+    $('.equal-height').equalHeights()

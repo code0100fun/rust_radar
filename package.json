@@ -28,7 +28,6 @@
     "grunt-concurrent": "~0.4.3",
     "grunt-open": "~0.2.3",
     "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-compass": "~0.7.0",
     "grunt-mocha-test": "~0.8.2",
     "chai": "~1.8.1",
     "grunt-emblem": "~0.1.0",
@@ -40,7 +39,10 @@
     "browserify-shim": "~3.2.2",
     "simplewebrtc": "~1.1.1",
     "socket.io-client": "~0.9.16",
-    "bower": "~1.2.8"
+    "bower": "~1.2.8",
+    "moment": "~2.5.1",
+    "grunt-contrib-sass": "~0.7.2",
+    "grunt-contrib-concat": "~0.3.0"
   },
   "devDependencies": {},
   "engines": {

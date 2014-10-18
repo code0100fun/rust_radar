@@ -1,6 +1,15 @@
-outlet "map"
-
 /* render "instructions" */
-outlet "users"
 
-outlet "rtc"
+#wrap.equal-height.equal-height-master
+
+  .row
+    .col-sm-6.col-md-8.col-lg-8
+      outlet "map"
+    .col-sm-6.col-md-4.col-lg-4.equal-height.sidebar
+      .row
+        outlet "users"
+      .row
+        outlet "chat"
+
+#footer.footer.dark
+/* outlet "rtc" */

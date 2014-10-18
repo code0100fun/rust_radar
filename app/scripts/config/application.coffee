@@ -1,4 +1,5 @@
 require('jquery')
+require('equalHeights')
 require('raphael')
 window.Handlebars = require('handlebars')
 Ember = require('ember')

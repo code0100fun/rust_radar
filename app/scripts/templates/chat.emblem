@@ -1,0 +1,10 @@
+.chat.dark.shadow-top-right
+  .panel-container
+    .panel-header
+      .title.center Chat
+    .panel-content
+      .history
+        each message in messages
+          partial "message"
+      .command-container
+        App.ContenteditableView valueBinding="text" action="sendChat" class="command-line" target="controller" placeholder="say:"

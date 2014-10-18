@@ -1,0 +1,21 @@
+.chat.hud.bottom-left
+  .screen-frame-outer.shadow-top-right
+    .screen-frame-middle
+      .screen-frame-inner
+        /* .overlay.screen-glow */
+        /* .overlay.canvar */
+        /* .overlay.screen-shadow */
+        .overlay.scanlines
+        .screen
+          .panel-container
+            .cursor.animate
+            .panel-header
+              .title.center Chat
+            .panel-content
+              .panel-inner-content
+                .history
+                  each message in messages
+                    partial "message"
+                .command-container
+                  .command-prompt
+                  App.ContenteditableView valueBinding="text" action="sendChat" class="command-line" target="controller"
